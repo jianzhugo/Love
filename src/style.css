@@ -1,0 +1,61 @@
+/* stylelint-disable at-rule-no-unknown */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+/* stylelint-enable at-rule-no-unknown */
+
+body {
+  font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  background: linear-gradient(135deg, #f71a3b 0%, #74b9ff 100%);
+  min-height: 100vh;
+  cursor: url('/images/mouse/default.cur') 0 0, auto;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* 自定义动画 */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+/* 自定义滚动条 */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.5);
+}
+
+/* 自定义鼠标指针 */
+a, button, .cursor-pointer {
+  cursor: url('/images/mouse/pointer.cur') 0 0, pointer;
+}
+
+/* 文本选择时的鼠标指针 */
+input, textarea, [contenteditable] {
+  cursor: url('/images/mouse/text.cur') 0 0, text;
+}
+
+/* 拖拽时的鼠标指针 */
+[draggable] {
+  cursor: url('/images/mouse/move.cur') 0 0, move;
+}
