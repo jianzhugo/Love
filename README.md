@@ -2,7 +2,7 @@
 
 一个基于 Vue 3 构建的浪漫爱情主题网站，记录美好时光、分享爱情故事，支持网友留言祝福。
 
-![演示效果](https://github.com/jianzhugo/Love/images/jiepin.png)
+![演示效果](https://love.jianzhugo.com/images/jiepin.png)
 
 ## ✨ 特色功能
 
@@ -66,15 +66,18 @@ npm run preview
 
 ### 静态部署
 
-1. 配置config.json中的相关API
+1. 在 **public **文件夹下新建 **config.json** 文件
 
-   twikooLink：Twikoo云函数URL
+   填写如下内容：
 
-   wikiCloudApiKey：维格云API密钥
-
-   wikiCloudDatasheetId：配置表格ID
-
-   wikiCloudViewId：配置视图ID
+   ```json
+   {
+     "twikooLink": "Twikoo云函数URL",
+     "wikiCloudApiKey": "维格云API密钥",
+     "wikiCloudDatasheetId": "维格云表格ID",
+     "wikiCloudViewId": "维格云视图ID"
+   }
+   ```
 
 2. 构建生产版本
 

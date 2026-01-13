@@ -30,9 +30,9 @@
       </router-link>
       
       <!-- 时间线按钮 -->
-      <router-link to="/timeline" class="bg-orange-500 bg-opacity-90 backdrop-blur-sm rounded-lg p-1 shadow-md hover:shadow-lg transition-all duration-300 flex items-center justify-center" title="时间线">
+      <router-link to="/timeline" class="bg-orange-500 bg-opacity-90 backdrop-blur-sm rounded-lg p-1 shadow-md hover:shadow-lg transition-all duration-300 flex items-center justify-center" title="幸福之路">
         <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
-          <path d="M4 4h3l2-2h6l2 2h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2m8 3a5 5 0 0 0-5 5a5 5 0 0 0 5 5a5 5 0 0 0 5-5a5 5 0 0 0-5-5m0 2a3 3 0 0 1 3 3a3 3 0 0 1-3 3a3 3 0 0 1-3-3a3 3 0 0 1 3-3"></path>
+          <path d="M18.1 4.8c-.1-.5-.5-.8-1-.8H13l.2 3h-2.4l.2-3H6.8c-.5 0-.9.4-1 .8l-2.7 14c-.1.6.4 1.2 1 1.2H10l.3-5h3.4l.3 5h5.8c.6 0 1.1-.6 1-1.2zM10.4 13l.2-4h2.6l.2 4z"></path>
         </svg>
       </router-link>
     </div>
