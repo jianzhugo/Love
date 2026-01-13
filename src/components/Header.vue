@@ -73,7 +73,7 @@
           <use class="animate-wave-1" xlink:href="#gentle-wave" x="48" y="0" fill="url(#waveGradient)"></use>
           <use class="animate-wave-2" xlink:href="#gentle-wave" x="48" y="3" fill="url(#waveGradient)"></use>
           <use class="animate-wave-3" xlink:href="#gentle-wave" x="48" y="5" fill="url(#waveGradient)"></use>
-          <use class="animate-wave-4" xlink:href="#gentle-wave" x="48" y="7" fill="rgb(248, 243, 250)"></use>
+          <use class="animate-wave-4" xlink:href="#gentle-wave" x="48" y="7" fill="rgb(248, 243, 250, 1)"></use>
         </g>
       </svg>
     </div>
@@ -175,22 +175,22 @@ onMounted(async () => {
 
 /* 不同速度的波浪动画 */
 .animate-wave-1 {
-  animation: waveMove 15s linear infinite;
+  animation: waveMove 9s linear infinite;
   opacity: 1;
 }
 
 .animate-wave-2 {
-  animation: waveMove 13s linear infinite;
+  animation: waveMove 12s linear infinite;
   opacity: 1;
 }
 
 .animate-wave-3 {
-  animation: waveMove 11s linear infinite;
+  animation: waveMove 13s linear infinite;
   opacity: 1;
 }
 
 .animate-wave-4 {
-  animation: waveMove 9s linear infinite;
+  animation: waveMove 15s linear infinite;
   opacity: 1;
 }
 
