@@ -2,7 +2,7 @@
 
 一个基于 Vue 3 构建的浪漫爱情主题网站，记录美好时光、分享爱情故事，支持网友留言祝福。
 
-![演示效果](https://love.jianzhugo.com/images/jiepin.png)
+![演示效果](https://love.jianzhugo.cn/images/jiepin.png)
 
 ## ✨ 特色功能
 
