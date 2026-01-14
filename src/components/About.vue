@@ -7,10 +7,10 @@
       </div>
 
       <!-- 情侣介绍 -->
-      <div class="bg-white rounded-2xl shadow-lg p-8 mb-8">
+      <div class="bg-white-0.8 rounded-2xl shadow-lg p-8 mb-8">
         <div class="flex flex-col md:flex-row items-center gap-8">
           <!-- 男生头像 -->
-          <div class="w-24 h-24 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center overflow-hidden">
+          <div class="w-24 h-24 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center overflow-hidden hidden md:flex">
             <Avatar 
               :src="boyAvatar" 
               alt="男孩头像" 
@@ -21,7 +21,7 @@
           
           <!-- 情侣信息 -->
           <div class="flex-1 text-center">
-            <h2 class="text-2xl font-bold text-gray-800 mb-2">{{ boyName }} & {{ girlName }}</h2>
+            <h2 class="text-2xl font-bold text-red-500 mb-2">{{ boyName }} & {{ girlName }}</h2>
             <p class="text-gray-600 mb-4">相遇于 {{ meetDate }}，相爱于 {{ loveDate }}</p>
             <div class="flex justify-center items-center space-x-4 text-sm text-gray-500">
               <span>💖 相爱 {{ loveDays }} 天</span>
@@ -30,7 +30,7 @@
           </div>
           
           <!-- 女生头像 -->
-          <div class="w-24 h-24 bg-gradient-to-br from-secondary to-purple-400 rounded-full flex items-center justify-center overflow-hidden">
+          <div class="w-24 h-24 bg-gradient-to-br from-secondary to-purple-400 rounded-full flex items-center justify-center overflow-hidden hidden md:flex">
             <Avatar 
               :src="girlAvatar" 
               alt="女孩头像" 

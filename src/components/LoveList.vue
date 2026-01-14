@@ -44,9 +44,9 @@
         
         <!-- 统计信息 -->
         <div class="mt-8 pt-6 border-t border-gray-200 flex justify-between text-gray-600">
-          <span>总计：{{ loveList.length }} 项</span>
-          <span>已完成：{{ completedCount }} 项</span>
-          <span>未完成：{{ loveList.length - completedCount }} 项</span>
+          <span>总计：<span class="text-red-500 font-bold">{{ loveList.length }}</span> 项</span>
+          <span>完成：<span class="text-red-500 font-bold">{{ completedCount }}</span> 项</span>
+          <span>剩下：<span class="text-red-500 font-bold">{{ loveList.length - completedCount }}</span> 项</span>
         </div>
       </div>
     </div>

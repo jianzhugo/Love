@@ -18,9 +18,9 @@
       </div>
       
       <!-- 情侣头像 -->
-      <div class="flex justify-center space-x-20 mt-32">
+      <div class="flex justify-center space-x-8 sm:space-x-20 mt-16 sm:mt-32">
         <div class="text-center">
-          <div class="w-32 h-32 rounded-full overflow-hidden border-4 border-primary shadow-lg mx-auto">
+          <div class="w-20 h-20 sm:w-32 sm:h-32 rounded-full overflow-hidden border-4 border-primary shadow-lg mx-auto">
             <Avatar 
               :src="boyAvatar" 
               :alt="boyName" 
@@ -28,13 +28,13 @@
               placeholderSrc="/images/lazyload.svg"
             />
           </div>
-          <div class="mt-3 text-2xl text-white font-bold">{{ boyName }}</div>
+          <div class="mt-2 sm:mt-3 text-xl sm:text-2xl text-white font-bold">{{ boyName }}</div>
         </div>
         <div class="flex items-center justify-center">
           <div class="heart animate-beat"></div>
         </div>
         <div class="text-center">
-          <div class="w-32 h-32 rounded-full overflow-hidden border-4 border-primary shadow-lg mx-auto">
+          <div class="w-20 h-20 sm:w-32 sm:h-32 rounded-full overflow-hidden border-4 border-primary shadow-lg mx-auto">
             <Avatar 
               :src="girlAvatar" 
               :alt="girlName" 
@@ -42,7 +42,7 @@
               placeholderSrc="/images/lazyload.svg"
             />
           </div>
-          <div class="mt-3 text-2xl text-white font-bold">{{ girlName }}</div>
+          <div class="mt-2 sm:mt-3 text-xl sm:text-2xl text-white font-bold">{{ girlName }}</div>
         </div>
       </div>
     </div>
@@ -196,8 +196,12 @@ onMounted(async () => {
 
 /* 爱心样式 */
 .heart {
-  width: 30px;
-  height: 30px;
+  width: 20px;
+  height: 20px;
+  @media (min-width: 640px) {
+    width: 30px;
+    height: 30px;
+  }
   background-color: #ff3860;
   position: relative;
   transform: rotate(-45deg);
@@ -207,8 +211,12 @@ onMounted(async () => {
 .heart::before,
 .heart::after {
   content: '';
-  width: 30px;
-  height: 30px;
+  width: 20px;
+  height: 20px;
+  @media (min-width: 640px) {
+    width: 30px;
+    height: 30px;
+  }
   background-color: #ff3860;
   border-radius: 50%;
   position: absolute;
@@ -216,13 +224,19 @@ onMounted(async () => {
 }
 
 .heart::before {
-  top: -15px;
+  top: -10px;
   left: 0;
+  @media (min-width: 640px) {
+    top: -15px;
+  }
 }
 
 .heart::after {
-  left: 15px;
+  left: 10px;
   top: 0;
+  @media (min-width: 640px) {
+    left: 15px;
+  }
 }
 
 /* 心跳动画 */

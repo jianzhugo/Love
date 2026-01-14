@@ -21,7 +21,7 @@
       <!-- 时间线内容 -->
       <div v-else class="relative">
         <!-- 时间线轴线 -->
-        <div class="absolute left-1/2 transform -translate-x-1/2 w-1 bg-white bg-opacity-30 h-full"></div>
+        <div class="absolute left-1/2 transform -translate-x-1/2 w-1 bg-red-300 h-full"></div>
         
         <!-- 时间线事件 -->
         <div class="space-y-12">
@@ -32,7 +32,7 @@
                 'rounded-xl shadow-lg p-6 transition-all duration-500 hover:shadow-xl cursor-pointer mx-auto w-full md:w-2/3',
                 expandedEvents.has(event.id) 
                   ? 'bg-gradient-to-br from-primary to-accent text-white' 
-                  : 'bg-white text-gray-800'
+                  : 'bg-white text-gray-600'
               ]"
               @click="toggleEvent(event.id)"
             >
@@ -115,20 +115,4 @@ const toggleEvent = (eventId) => {
 
 <style scoped>
 /* Timeline组件样式 */
-@media (max-width: 768px) {
-  .timeline div.relative > div.absolute {
-    left: 20px;
-  }
-  
-  .timeline div.space-y-12 > div > div:first-child {
-    margin-left: 50px;
-    margin-right: 0;
-    padding-left: 0;
-    padding-right: 0;
-  }
-  
-  .timeline div.space-y-12 > div > div:last-child {
-    left: 20px;
-  }
-}
 </style>
