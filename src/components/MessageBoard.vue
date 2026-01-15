@@ -1,7 +1,7 @@
 <template>
   <div class="message-board py-12">
     <div class="container mx-auto px-4">
-      <h2 class="text-2xl text-center bg-gradient-to-r from-red-500 to-blue-500 bg-clip-text text-transparent mb-6">📩感谢五湖四海朋友的祝福</h2>
+      <h2 class="text-2xl text-center bg-gradient-to-r from-red-500 to-blue-500 bg-clip-text text-transparent mb-6">{{ blessTitle }}</h2>
       
       <!-- 留言板容器 -->
       <div class="bg-transparent rounded-xl shadow-lg p-6 max-w-4xl mx-auto">
@@ -14,11 +14,14 @@
 
 <script setup>
 import { onMounted, ref } from 'vue'
+import { getConfigFromWikiCloud } from '../utils/api'
 
 // 用于跟踪Twikoo脚本是否已加载
 const twikooLoaded = ref(false)
 // 用于跟踪初始化状态
 const twikooInitialized = ref(false)
+// 留言板标题
+const blessTitle = ref('📩感谢五湖四海朋友的祝福')
 
 // Twikoo脚本的备用CDN地址列表
 const twikooCdnUrls = [
@@ -121,7 +124,16 @@ const initTwikoo = async () => {
   }
 }
 
-onMounted(() => {
+onMounted(async () => {
+  // 获取配置数据
+  try {
+    const config = await getConfigFromWikiCloud()
+    blessTitle.value = config.blessTitle || blessTitle.value
+  } catch (error) {
+    console.error('获取配置数据失败:', error)
+  }
+  
+  // 加载Twikoo脚本
   loadTwikooScript()
 })
 </script>

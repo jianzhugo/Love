@@ -1,7 +1,7 @@
 <template>
   <div class="moments py-12">
     <div class="container mx-auto px-4">
-      <h2 class="text-2xl text-center bg-gradient-to-r from-red-500 to-blue-500 bg-clip-text text-transparent mb-6">💕世间最动情之事，莫过于两人相依💑，走过四季三餐的温暖。</h2>
+      <h2 class="text-2xl text-center bg-gradient-to-r from-red-500 to-blue-500 bg-clip-text text-transparent mb-6">{{ momentTitle }}</h2>
       
       <!-- 加载状态 -->
       <div v-if="isLoading" class="flex justify-center items-center py-16">
@@ -47,21 +47,26 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { getMomentsFromWikiCloud } from '../utils/api'
+import { getMomentsFromWikiCloud, getConfigFromWikiCloud } from '../utils/api'
 
-// 状态管理
-const isLoading = ref(false)
+// 生活点滴数据
 const moments = ref([])
+const isLoading = ref(true)
+const momentTitle = ref('💕世间最动情之事，莫过于两人相依💑，走过四季三餐的温暖。')
 
-// 初始化
+// 从维基云表格获取生活点滴数据
 onMounted(async () => {
   isLoading.value = true
   try {
-    // 从维基云表格获取数据
+    // 获取配置数据
+    const config = await getConfigFromWikiCloud()
+    momentTitle.value = config.momentTitle || momentTitle.value
+    
+    // 获取生活点滴数据
     const data = await getMomentsFromWikiCloud()
     moments.value = data
   } catch (error) {
-    console.error('获取生活点滴数据失败:', error)
+    console.error('获取数据失败:', error)
   } finally {
     isLoading.value = false
   }

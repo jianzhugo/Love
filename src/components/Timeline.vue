@@ -1,7 +1,7 @@
 <template>
   <div class="timeline py-12">
     <div class="container mx-auto px-4">
-      <h2 class="text-2xl text-center bg-gradient-to-r from-red-500 to-blue-500 bg-clip-text text-transparent mb-6">💞我们风雨同舟一起走✈️</h2>
+      <h2 class="text-2xl text-center bg-gradient-to-r from-red-500 to-blue-500 bg-clip-text text-transparent mb-6">{{ timelineTitle }}</h2>
       
       <!-- 每日一句 -->
       <div class="mt-4 p-4 rounded-lg mb-8 text-center">
@@ -74,17 +74,18 @@ const isLoading = ref(true)
 const expandedEvents = ref(new Set())
 // 每日一句
 const dailyQuote = ref('爱你每一天')
+// 时间线标题
+const timelineTitle = ref('💞我们风雨同舟一起走✈️')
 
 // 从维基云表格获取数据
 onMounted(async () => {
   isLoading.value = true
   try {
-    // 获取时间线数据
-    const timelineData = await getTimelineFromWikiCloud()
-    timelineEvents.value = timelineData
-    
     // 获取配置数据
     const config = await getConfigFromWikiCloud()
+    
+    // 更新标题
+    timelineTitle.value = config.timelineTitle || timelineTitle.value
     
     // 更新每日一句
     if (config.dailyQuote) {
@@ -96,6 +97,10 @@ onMounted(async () => {
         dailyQuote.value = quotes[randomIndex]
       }
     }
+    
+    // 获取时间线数据
+    const timelineData = await getTimelineFromWikiCloud()
+    timelineEvents.value = timelineData
   } catch (error) {
     console.error('获取数据失败:', error)
   } finally {

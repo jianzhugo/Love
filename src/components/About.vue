@@ -2,12 +2,12 @@
   <div class="container mx-auto px-4 py-8">
     <div class="max-w-4xl mx-auto">
       <!-- 页面标题 -->
-      <div class="text-center mb-12">
-        <h1 class="text-2xl text-center bg-gradient-to-r from-red-500 to-blue-500 bg-clip-text text-transparent mb-6">我们的爱情故事💑从这里开始</h1>    
+      <div class="text-center mt-12 mb-12">
+        <h1 class="text-2xl text-center bg-gradient-to-r from-red-500 to-blue-500 bg-clip-text text-transparent mb-6">{{ aboutTitle }}</h1>    
       </div>
 
       <!-- 情侣介绍 -->
-      <div class="bg-white-0.8 rounded-2xl shadow-lg p-8 mb-8">
+      <div class="bg-white rounded-2xl shadow-lg p-8 mb-8">
         <div class="flex flex-col md:flex-row items-center gap-8">
           <!-- 男生头像 -->
           <div class="w-24 h-24 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center overflow-hidden hidden md:flex">
@@ -74,6 +74,7 @@ export default {
     const loveDays = ref(0)
     const meetDays = ref(0)
     const loveDeclaration = ref('愿有岁月可回首，且以深情共白头。\n在时光的长河里，我们携手同行，\n用爱书写属于我们的浪漫篇章。')
+    const aboutTitle = ref('我们的爱情故事💑从这里开始')
 
     const calculateDays = (startDate) => {
       const start = new Date(startDate)
@@ -92,6 +93,7 @@ export default {
         meetDate.value = config.meetDate || config.meet || meetDate.value
         loveDate.value = config.loveDate || loveDate.value
         loveDeclaration.value = config.sayLove || loveDeclaration.value
+        aboutTitle.value = config.aboutTitle || aboutTitle.value
       } catch (error) {
         console.error('获取配置失败:', error)
       }
@@ -109,7 +111,8 @@ export default {
       loveDate,
       loveDays,
       meetDays,
-      loveDeclaration
+      loveDeclaration,
+      aboutTitle
     }
   }
 }

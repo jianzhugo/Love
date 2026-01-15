@@ -1,7 +1,7 @@
 <template>
   <div class="gallery py-12">
     <div class="container mx-auto px-4">
-      <h2 class="text-2xl text-center bg-gradient-to-r from-red-500 to-blue-500 bg-clip-text text-transparent mb-6">💓和你的每一个瞬间都值得留下💓</h2>
+      <h2 class="text-2xl text-center bg-gradient-to-r from-red-500 to-blue-500 bg-clip-text text-transparent mb-6">{{ photoTitle }}</h2>
       
       <!-- 相册分类 -->
       <div class="flex flex-wrap justify-center gap-4 mb-8">
@@ -90,7 +90,7 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { getGalleryPhotosFromWikiCloud } from '../utils/api'
+import { getGalleryPhotosFromWikiCloud, getConfigFromWikiCloud } from '../utils/api'
 
 // 相册数据
 const photos = ref([])
@@ -103,10 +103,18 @@ const activeCategory = ref('全部')
 // 图片预览
 const previewImage = ref('')
 
+// 相册标题
+const photoTitle = ref('💓和你的每一个瞬间都值得留下💓')
+
 // 从维基云表格获取相册数据
 onMounted(async () => {
   isLoading.value = true
   try {
+    // 获取配置数据
+    const config = await getConfigFromWikiCloud()
+    photoTitle.value = config.photoTitle || photoTitle.value
+    
+    // 获取相册数据
     const data = await getGalleryPhotosFromWikiCloud()
     photos.value = data
     
@@ -114,7 +122,7 @@ onMounted(async () => {
     const uniqueCategories = [...new Set(data.map(photo => photo.category))]
     categories.value = ['全部', ...uniqueCategories]
   } catch (error) {
-    console.error('获取相册数据失败:', error)
+    console.error('获取数据失败:', error)
   } finally {
     isLoading.value = false
   }

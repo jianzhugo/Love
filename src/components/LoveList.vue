@@ -1,7 +1,7 @@
 <template>
   <div class="love-list py-12">
     <div class="container mx-auto px-4">
-      <h2 class="text-2xl text-center bg-gradient-to-r from-red-500 to-blue-500 bg-clip-text text-transparent mb-6">📜一百件事记录着我们的点点滴滴，你一百种样子💃，我一百种喜欢。</h2>
+      <h2 class="text-2xl text-center bg-gradient-to-r from-red-500 to-blue-500 bg-clip-text text-transparent mb-6">{{ listTitle }}</h2>
       
       <!-- 加载状态 -->
       <div v-if="isLoading" class="flex justify-center items-center py-16">
@@ -55,20 +55,26 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { getLoveListFromWikiCloud } from '../utils/api'
+import { getLoveListFromWikiCloud, getConfigFromWikiCloud } from '../utils/api'
 
 // 爱情清单数据
 const loveList = ref([])
 const isLoading = ref(true)
+const listTitle = ref('📜一百件事记录着我们的点点滴滴，你一百种样子💃，我一百种喜欢。')
 
 // 从维基云表格获取爱情清单数据
 onMounted(async () => {
   isLoading.value = true
   try {
+    // 获取配置数据
+    const config = await getConfigFromWikiCloud()
+    listTitle.value = config.listTitle || listTitle.value
+    
+    // 获取爱情清单数据
     const data = await getLoveListFromWikiCloud()
     loveList.value = data
   } catch (error) {
-    console.error('获取爱情清单数据失败:', error)
+    console.error('获取数据失败:', error)
   } finally {
     isLoading.value = false
   }
