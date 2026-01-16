@@ -70,7 +70,7 @@ const placeholderStyle = computed(() => {
 })
 
 // 头像加载成功处理
-const handleLoad = (e) => {
+const handleLoad = () => {
   isLoaded.value = true
 }
 
@@ -89,11 +89,9 @@ const handleError = (e) => {
   overflow: hidden;
 }
 
-.avatar-placeholder {
-  /* 基础样式由计算属性提供 */
-}
 
-:deep(.avatar-placeholder img) {
+
+:deep(.avatar-placeholder) {
   background-color: rgba(255, 255, 255, 0.1);
 }
 </style>

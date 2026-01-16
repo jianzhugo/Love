@@ -1,5 +1,5 @@
 // 维基云表格API配置
-const WIKI_CLOUD_API = 'https://api.vika.cn/fusion/v1'
+const WIKI_CLOUD_API = 'https://vika.cn/fusion/v1'
 
 // 维基云配置，按优先级加载
 // 1. 优先使用环境变量（适用于EdgeOne Pages/Vercel部署）
@@ -208,7 +208,7 @@ function parseSheetConfig(configString) {
   
   const [apiKey, datasheetId, viewId] = configString.split(',')
   
-  if (!apiKey || !datasheetId || !viewId) {
+  if (!apiKey || !datasheetId) {
     return null
   }
   
@@ -620,4 +620,153 @@ export function calculateLoveDays(loveDate) {
   const startDate = new Date(loveDate)
   const timeDiff = today.getTime() - startDate.getTime()
   return Math.floor(timeDiff / (1000 * 3600 * 24))
+}
+
+/**
+ * 从维基云表格获取留言数据
+ * @returns {Promise<Array>} 留言数组
+ */
+export async function getMessagesFromWikiCloud() {
+  const cacheKey = 'wiki_cloud_messages'
+  
+  // 检查缓存是否有效
+  if (cacheManager.isCacheValid(cacheKey)) {
+    // 更新访问信息，检查是否需要重新获取数据
+    const needRefresh = cacheManager.updateAccessInfo(cacheKey)
+    
+    if (!needRefresh) {
+      // 不需要重新获取，返回缓存数据
+      const cachedData = cacheManager.getCache(cacheKey)
+      return cachedData.data
+    }
+    // 需要重新获取，继续执行API请求
+  }
+  
+  try {
+    // 等待配置加载完成
+    await configLoadedPromise
+    
+    // 先获取配置，包含message表格的API信息
+    const config = await getConfigFromWikiCloud()
+    const messageConfig = parseSheetConfig(config['message'])
+    
+    if (!messageConfig) {
+      throw new Error('留言表格配置无效')
+    }
+    
+    const response = await fetch(`${WIKI_CLOUD_API}/datasheets/${messageConfig.datasheetId}/records?viewId=${messageConfig.viewId}`, {
+      headers: {
+        'Authorization': `Bearer ${messageConfig.apiKey}`,
+        'Content-Type': 'application/json'
+      }
+    })
+    
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}))
+      throw new Error(`API请求失败: ${response.status} ${response.statusText} ${JSON.stringify(errorData)}`)
+    }
+    
+    const data = await response.json()
+    
+    // 将表格记录转换为留言数组
+    const messages = data.data.records.map(record => ({
+      id: record.recordId,
+      nickname: record.fields.nickname || '',
+      email: record.fields.email || '',
+      content: record.fields.content || '',
+      avatar: record.fields.avatar || '',
+      ip: record.fields.ipAddress || '',
+      userAgent: record.fields.userAgent || '',
+      createTime: record.fields.createTime || '',
+      isApproved: record.fields.isApproved || '是',
+      blog: record.fields.blog || ''
+    })).filter(message => message.isApproved === '是') // 只返回已审核通过的留言
+      .sort((a, b) => new Date(b.createTime) - new Date(a.createTime)) // 按时间降序排列，最新的在前面
+    
+    // 保存到缓存（会重置刷新计数）
+    cacheManager.setCache(cacheKey, messages)
+    return messages
+  } catch (error) {
+    console.error('从维基云表格获取留言失败:', error)
+    
+    // 尝试从缓存获取
+    const cachedData = cacheManager.getCache(cacheKey)
+    if (cachedData) {
+      // 更新访问信息（但不强制刷新）
+      cacheManager.updateAccessInfo(cacheKey)
+      return cachedData.data
+    }
+    
+    // 返回默认数据
+    return []
+  }
+}
+
+/**
+ * 向维基云表格提交新留言
+ * @param {Object} messageData 留言数据
+ * @returns {Promise<Object>} 提交结果
+ */
+export async function submitMessageToWikiCloud(messageData) {
+  try {
+    // 等待配置加载完成
+    await configLoadedPromise
+    
+    // 先获取配置，包含message表格的API信息
+    const config = await getConfigFromWikiCloud()
+    const messageConfig = parseSheetConfig(config['message'])
+    
+    if (!messageConfig) {
+      throw new Error('留言表格配置无效')
+    }
+    
+    // 准备提交数据 - 自增id字段由系统自动生成，不需要手动提交
+    const submitData = {
+      records: [
+        {
+          fields: {
+            nickname: messageData.nickname,
+            email: messageData.email,
+            content: messageData.content,
+            avatar: messageData.avatar,
+            ipAddress: messageData.ip,
+            userAgent: messageData.userAgent,
+            createTime: new Date().toISOString(),
+            isApproved: '是', // 默认直接通过审核
+            blog: messageData.blog || ''
+          }
+        }
+      ]
+    }
+    
+    // 添加fieldKey=name参数，确保按字段名匹配
+    const response = await fetch(`${WIKI_CLOUD_API}/datasheets/${messageConfig.datasheetId}/records?fieldKey=name`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${messageConfig.apiKey}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(submitData)
+    })
+    
+    // 输出响应状态和响应体，方便调试
+    console.log('API响应状态:', response.status)
+    try {
+      const responseBody = await response.clone().json()
+      console.log('API响应体:', responseBody)
+    } catch (error) {
+      console.error('解析响应体失败:', error)
+    }
+    
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}))
+      throw new Error(`API请求失败: ${response.status} ${response.statusText} ${JSON.stringify(errorData)}`)
+    }
+    
+    const data = await response.json()
+    return data
+  } catch (error) {
+    console.error('向维基云表格提交留言失败:', error)
+    throw error
+  }
 }
