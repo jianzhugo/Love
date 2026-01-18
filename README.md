@@ -1,6 +1,7 @@
 # 💖 情侣网站💖 
 
-一个基于 Vue 3 构建的浪漫爱情主题网站，记录美好时光、分享爱情故事，支持网友留言祝福。
+一个基于 Vue 3 构建的浪漫爱情主题网站，记录美好时光、分享爱情故事，支持网友留言祝福。仅需要一个维格云表格即可设置网站内容，无需后端。
+详细说明点击：[https://blog.jianzhugo.cn/post/e3ef35c8.html](https://blog.jianzhugo.cn/post/e3ef35c8.html)
 
 ![演示效果](https://love.jianzhugo.cn/images/jiepin.png)
 
@@ -15,7 +16,7 @@
 ### 🌟 核心功能
 - **时光轴**：记录爱情历程中的重要时刻
 - **照片画廊**：展示美好瞬间
-- **留言板**：支持网友留言祝福（基于 Twikoo）
+- **留言板**：支持网友留言祝福（原生留言功能）
 - **爱情清单**：共同完成的目标和愿望
 - **美好瞬间**：分享生活中的小确幸
 
@@ -24,7 +25,7 @@
 - 基于 Vue 3 Composition API 开发
 - 使用 Vite 构建，开发体验流畅
 - 支持动态配置，从云端获取网站信息，基于维格云
-- Twikoo 评论系统，支持多 CDN 加载和重试机制
+
 - 自定义鼠标点击效果和页面动效
 
 ## 🛠 技术栈
@@ -33,7 +34,7 @@
 - **路由管理**：Vue Router 4
 - **构建工具**：Vite
 - **样式方案**：Tailwind CSS
-- **评论系统**：Twikoo
+
 - **API 工具**：自定义 API 模块
 
 ## 📦 安装与运行
@@ -72,7 +73,6 @@ npm run preview
 
    ```json
    {
-     "twikooLink": "Twikoo云函数URL",
      "wikiCloudApiKey": "维格云API密钥",
      "wikiCloudDatasheetId": "维格云表格ID",
      "wikiCloudViewId": "维格云视图ID"
@@ -92,17 +92,11 @@ npm run preview
 1. 连接 GitHub 仓库
 2. 选择 Vite 构建模板
 3. 添加环境变量：
-   - VITE_TWIKOO_LINK ：Twikoo云函数URL
    - VITE_WIKI_CLOUD_API_KEY ：维格云API密钥
    - VITE_WIKI_CLOUD_DATASHEET_ID ：配置表格ID
    - VITE_WIKI_CLOUD_VIEW_ID ：配置视图ID
 
-### Twikoo 评论系统配置
 
-1. 部署 Twikoo 云函数（支持 Vercel、腾讯云、云开发等）
-   - 参考 Twikoo 官方文档部署云函数 https://twikoo.js.org/quick-start.html
-2. 配置 Twikoo 链接：
-   - 按前文方法配置Twikoo链接
 
 ## 📁 项目结构
 
@@ -174,7 +168,6 @@ src/
 
 | 变量名 | 说明 |
 |--------|------|
-| VITE_TWIKOO_LINK | Twikoo 云函数 URL |
 | VITE_WIKI_CLOUD_API_KEY | 维格云API密钥 |
 | VITE_WIKI_CLOUD_DATASHEET_ID | 配置表格ID |
 | VITE_WIKI_CLOUD_VIEW_ID | 配置视图ID |

@@ -11,6 +11,11 @@ body {
   cursor: url('/images/mouse/default.cur') 0 0, auto;
 }
 
+/* 移除浏览器默认的聚焦轮廓 */
+*:focus {
+  outline: none;
+}
+
 .container {
   max-width: 1200px;
   margin: 0 auto;

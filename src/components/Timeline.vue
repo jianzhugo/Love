@@ -49,7 +49,7 @@
                 <p class="mb-4 text-center text-white/90">{{ event.description }}</p>
                 <!-- 事件图片 -->
                 <div v-if="event.image" class="rounded-lg overflow-hidden">
-                  <img :src="event.image" :alt="event.title" class="w-full h-48 object-cover">
+                  <img :src="event.image" :alt="event.title" class="w-full h-auto object-contain">
                 </div>
               </div>
             </div>

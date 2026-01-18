@@ -4,14 +4,14 @@
       <h2 class="text-2xl text-center bg-gradient-to-r from-red-500 to-blue-500 bg-clip-text text-transparent mb-6">{{ blessTitle }}</h2>
       
       <!-- 留言板容器 -->
-      <div class="bg-white-0.9 rounded-xl shadow-lg p-6 max-w-4xl mx-auto">
+      <div class="bg-white-0.9 rounded-xl shadow-lg shadow-blue-300 p-6 max-w-3xl mx-auto">
         <!-- 留言列表标题 -->
         <div class="mb-6 text-center">
           <h3 class="text-xl font-bold text-ff6b81">累计已经收到 <span class="text-3xl"> {{ messages.length }} </span> 条祝福</h3>
         </div>
         
         <!-- 留言列表 -->
-        <div class="messages-list space-y-1.5">
+        <div class="messages-list space-y-0.5">
           <div 
             v-for="message in messages" 
             :key="message.id"
@@ -55,7 +55,7 @@
               
               <!-- 地区和时间 -->
               <div class="meta-section flex items-center gap-2 text-xs sm:text-sm text-gray-500 mb-2">
-                <span>{{ getIpLocation(message.ip) }}</span>
+                <span>{{ message.location || '获取位置中...' }}</span>
                 <span>•</span>
                 <span>{{ formatTime(message.createTime) }}</span>
               </div>
@@ -69,7 +69,7 @@
           
           <!-- 空状态 -->
           <div v-if="messages.length === 0" class="text-center py-12 text-gray-500">
-            <p>暂未收到祝福，快来成为第一个祝福人吧！</p>
+            <p>快来成为第一个祝福人吧！</p>
           </div>
           
           <!-- 加载中状态 -->
@@ -95,7 +95,7 @@
                 v-model="form.nickname" 
                 required 
                 maxlength="20"
-                class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-ff6b81 focus:border-transparent transition-all"
+                class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-[#f9802d] focus:border-[#f9802d] transition-all"
                 placeholder="昵称（必填）"
               >
               
@@ -104,7 +104,7 @@
                 id="email" 
                 v-model="form.email" 
                 required
-                class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-ff6b81 focus:border-transparent transition-all"
+                class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-[#f9802d] focus:border-[#f9802d] transition-all"
                 placeholder="邮箱（必填）"
               >
               
@@ -112,7 +112,7 @@
                 type="url" 
                 id="blog" 
                 v-model="form.blog" 
-                class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-ff6b81 focus:border-transparent transition-all"
+                class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-[#f9802d] focus:border-[#f9802d] transition-all"
                 placeholder="博客（选填）"
               >
             </div>
@@ -125,7 +125,7 @@
                 required 
                 maxlength="500"
                 rows="4"
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-ff6b81 focus:border-transparent transition-all resize-none"
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-[#f9802d] focus:border-[#f9802d] transition-all resize-none"
                 placeholder="发送祝福后需连续刷新2次才会显示..."
               ></textarea>
             </div>
@@ -136,10 +136,10 @@
               <button 
                 type="button" 
                 @click="toggleEmojiPicker"
-                class="w-auto px-4 py-3 bg-gray-100 text-gray-700 font-medium rounded-lg hover:bg-gray-200 transition-all duration-300 flex items-center"
+                class="w-auto px-3 py-3 bg-gray-100 text-gray-700 font-medium rounded-lg hover:bg-gray-200 transition-all duration-300 flex items-center"
+                title="表情"
               >
-                <span class="mr-2">😊</span>
-                表情
+                <span>😊</span>
               </button>
               
               <!-- 表情选择面板 -->
@@ -229,15 +229,99 @@ const insertEmoji = (emoji) => {
 
 // 获取IP地址
 const getUserIp = async () => {
+  // 定义IP获取服务，优先获取IPv4地址
+  const ipServices = [
+    // IPv4优先的服务
+    'https://ipv4.icanhazip.com',      // 仅返回IPv4地址
+    'https://api.ipify.org?format=json&type=4', // 仅返回IPv4地址
+    'https://ifconfig.me/ip',           // 优先返回IPv4地址
+    'https://api64.ipify.org?format=json&type=4', // 仅返回IPv4地址
+    // IPv6服务（作为备选）
+    'https://api.ipify.org?format=json&type=6',
+    'https://api64.ipify.org?format=json&type=6'
+  ];
+  
+  // 尝试从多个服务获取IP
+  for (const service of ipServices) {
+    try {
+      const response = await fetch(service, {
+        method: 'GET',
+        mode: 'cors',
+        headers: {
+          'Accept': 'application/json, text/plain, */*'
+        },
+        timeout: 5000 // 设置5秒超时
+      });
+      
+      if (response.ok) {
+        // 处理不同服务的响应格式
+        let ip;
+        if (service.includes('ipify')) {
+          // ipify返回JSON格式
+          const data = await response.json();
+          ip = data.ip;
+        } else {
+          // 其他服务返回纯文本IP
+          ip = await response.text();
+          ip = ip.trim();
+        }
+        
+        // 如果获取到的是IPv4地址，直接返回
+        if (!ip.includes(':')) {
+          return ip;
+        }
+        
+        // 对于IPv6地址，仅当所有IPv4服务都失败时才返回
+        if (service.includes('type=6')) {
+          return ip;
+        }
+      }
+    } catch (error) {
+      console.warn(`从${service}获取IP失败:`, error.message);
+      // 继续尝试下一个服务
+      continue;
+    }
+  }
+  
+  // 如果所有服务都失败，尝试从navigator获取IP地址，优先IPv4
   try {
-    const response = await fetch('https://api.ipify.org?format=json')
-    if (response.ok) {
-      const data = await response.json()
-      return data.ip
+    if (navigator && navigator.connection && navigator.connection.rtt) {
+      const peerConnection = new RTCPeerConnection();
+      peerConnection.createDataChannel('');
+      const offer = await peerConnection.createOffer();
+      await peerConnection.setLocalDescription(offer);
+      
+      // 从SDP中提取IP地址，优先IPv4
+      const sdpLines = peerConnection.localDescription.sdp.split('\n');
+      let ipv6Address = null;
+      
+      for (const line of sdpLines) {
+        if (line.startsWith('c=')) {
+          const ip = line.split(' ')[2];
+          if (ip && ip !== '0.0.0.0') {
+            // 如果是IPv4地址，直接返回
+            if (!ip.includes(':')) {
+              peerConnection.close();
+              return ip;
+            }
+            // 保存IPv6地址作为备选
+            ipv6Address = ip;
+          }
+        }
+      }
+      
+      peerConnection.close();
+      
+      // 如果没有找到IPv4地址，返回IPv6地址
+      if (ipv6Address) {
+        return ipv6Address;
+      }
     }
   } catch (error) {
-    console.error('获取IP地址失败:', error)
+    console.warn('从RTCPeerConnection获取IP失败:', error.message);
   }
+  
+  // 所有方法都失败，返回默认值
   return '未知IP'
 }
 
@@ -246,49 +330,160 @@ const generateAvatar = async (email) => {
   const errorAvatar = '/favicon.ico'; // 加载失败时使用的头像
   
   // 检查是否为QQ邮箱
-  const qqRegex = /^(\d+)@qq\.com$/;
+  const qqRegex = /^\d+@qq\.com$/;
   const qqMatch = email.match(qqRegex);
   if (qqMatch) {
-    const qqAvatar = `http://q.qlogo.cn/headimg_dl?dst_uin=${qqMatch[1]}&spec=640&img_type=jpg`;
-    if (await checkImageExists(qqAvatar)) {
-      return qqAvatar;
+    // 提取QQ号码
+    const qqNumber = email.split('@')[0];
+    const qqAvatar = `https://q1.qlogo.cn/g?b=qq&nk=${qqNumber}&s=640`;
+    return qqAvatar; // QQ头像服务比较可靠，直接返回
+  }
+  
+  // 生成邮箱的MD5哈希
+  const md5Email = md5(email.toLowerCase().trim());
+  
+  // 定义多个国内可用的头像服务，增加可靠性
+  const avatarServices = [
+    // Cravatar.cn - 国内Gravatar镜像
+    `https://cravatar.cn/avatar/${md5Email}?d=mp&s=640`,
+    // 七牛云提供的Gravatar镜像
+    `https://dn-qiniu-avatar.qbox.me/avatar/${md5Email}?d=mp&s=640`,
+    // 本地默认头像（使用favicon.ico作为备用）
+    errorAvatar
+  ];
+  
+  // 尝试从多个服务获取头像，返回第一个可用的
+  for (const avatarUrl of avatarServices) {
+    try {
+      // 对于非本地头像，使用fetch检查可用性
+      if (avatarUrl !== errorAvatar) {
+        const response = await fetch(avatarUrl, {
+          method: 'HEAD', // 使用HEAD请求，只获取响应头，不下载图片
+          mode: 'cors',
+          timeout: 2000 // 设置2秒超时
+        });
+        
+        // 如果响应状态码为200，说明图片存在
+        if (response.ok) {
+          return avatarUrl;
+        }
+      } else {
+        // 本地头像直接返回
+        return avatarUrl;
+      }
+    } catch (error) {
+      console.warn(`头像服务 ${avatarUrl} 不可用:`, error.message);
+      // 继续尝试下一个服务
+      continue;
     }
   }
   
-  // 使用Cravatar.cn头像服务
-  const md5Email = md5(email.toLowerCase().trim());
-  const cravatarAvatar = `https://cravatar.cn/avatar/${md5Email}?d=404`;
-  if (await checkImageExists(cravatarAvatar)) {
-    return cravatarAvatar;
-  }
-  
-  // 无法获取头像时使用错误头像
+  // 所有服务都失败时使用错误头像
   return errorAvatar;
 }
 
-// 检查图片是否存在
-const checkImageExists = (url) => {
-  return new Promise((resolve) => {
-    const img = new Image();
-    img.onload = () => resolve(true);
-    img.onerror = () => resolve(false);
-    img.src = url;
-  });
-}
-
-
-
-// 使用简化的MD5算法，避免复杂的内部函数
+// 使用更可靠的MD5算法实现
 const md5 = (str) => {
-  // 简单的哈希实现，用于生成头像URL
-  let hash = 0;
-  for (let i = 0; i < str.length; i++) {
-    const char = str.charCodeAt(i);
-    hash = ((hash << 5) - hash) + char;
-    hash = hash & hash;
+  // 参考RFC 1321实现的简化MD5算法
+  const rotateLeft = (n, s) => (n << s) | (n >>> (32 - s));
+  
+  const c1 = 0xcc9e2d51;
+  const c2 = 0x1b873593;
+  const c3 = 0xe6546b64;
+  const c4 = 0x85ebca6b;
+  const c5 = 0xc2b2ae35;
+  
+  let h0 = 0x67452301;
+  let h1 = 0xefcdab89;
+  let h2 = 0x98badcfe;
+  let h3 = 0x10325476;
+  
+  str += String.fromCharCode(0x80);
+  
+  let l = str.length * 8;
+  let trail = l % 512;
+  let k = trail < 448 ? 448 - trail : 512 + 448 - trail;
+  
+  for (let i = 0; i < k / 8; i++) {
+    str += String.fromCharCode(0x00);
   }
-  const hex = Math.abs(hash).toString(16).padStart(32, '0');
-  return hex;
+  
+  str += String.fromCharCode(
+    (l >>> 24) & 0xff,
+    (l >>> 16) & 0xff,
+    (l >>> 8) & 0xff,
+    l & 0xff
+  );
+  
+  for (let i = 0; i < str.length; i += 64) {
+    const w = new Array(16);
+    for (let j = 0; j < 16; j++) {
+      w[j] = (
+        (str.charCodeAt(i + j * 4) & 0xff) << 24 |
+        (str.charCodeAt(i + j * 4 + 1) & 0xff) << 16 |
+        (str.charCodeAt(i + j * 4 + 2) & 0xff) << 8 |
+        (str.charCodeAt(i + j * 4 + 3) & 0xff)
+      );
+    }
+    
+    let a = h0;
+    let b = h1;
+    let c = h2;
+    let d = h3;
+    
+    for (let j = 0; j < 64; j++) {
+      let f, g;
+      if (j < 16) {
+        f = (b & c) | (~b & d);
+        g = j;
+      } else if (j < 32) {
+        f = (d & b) | (~d & c);
+        g = (5 * j + 1) % 16;
+      } else if (j < 48) {
+        f = b ^ c ^ d;
+        g = (3 * j + 5) % 16;
+      } else {
+        f = c ^ (b | ~d);
+        g = (7 * j) % 16;
+      }
+      
+      const temp = d;
+      d = c;
+      c = b;
+      b = b + rotateLeft((a + f + [c1, c2, c3, c4][Math.floor(j / 16)] + w[g]), [7, 12, 17, 22, 5, 9, 14, 20, 4, 11, 16, 23, 6, 10, 15, 21][j % 16]);
+      a = temp;
+    }
+    
+    h0 += a;
+    h1 += b;
+    h2 += c;
+    h3 += d;
+  }
+  
+  // 将结果转换为十六进制字符串
+  const toHex = (n) => {
+    const hex = n.toString(16);
+    return hex.length === 1 ? '0' + hex : hex;
+  };
+  
+  return (
+    toHex((h0 >>> 0) & 0xff) +
+    toHex((h0 >>> 8) & 0xff) +
+    toHex((h0 >>> 16) & 0xff) +
+    toHex((h0 >>> 24) & 0xff) +
+    toHex((h1 >>> 0) & 0xff) +
+    toHex((h1 >>> 8) & 0xff) +
+    toHex((h1 >>> 16) & 0xff) +
+    toHex((h1 >>> 24) & 0xff) +
+    toHex((h2 >>> 0) & 0xff) +
+    toHex((h2 >>> 8) & 0xff) +
+    toHex((h2 >>> 16) & 0xff) +
+    toHex((h2 >>> 24) & 0xff) +
+    toHex((h3 >>> 0) & 0xff) +
+    toHex((h3 >>> 8) & 0xff) +
+    toHex((h3 >>> 16) & 0xff) +
+    toHex((h3 >>> 24) & 0xff)
+  );
 }
 
 // 格式化时间为年-月-日
@@ -300,8 +495,11 @@ const formatTime = (timeString) => {
   return `${year}-${month}-${day}`;
 }
 
-// 获取IP所在地（模拟实现，实际项目中可使用IP查询API）
-const getIpLocation = (ip) => {
+// IP地理位置缓存，避免重复请求
+const ipLocationCache = new Map();
+
+// 获取IP所在地，使用第三方API获取真实地理位置
+const getIpLocation = async (ip) => {
   // 处理未知IP情况
   if (!ip || ip === '未知IP' || ip === 'unknown' || ip === '') {
     return '未知城市';
@@ -326,6 +524,11 @@ const getIpLocation = (ip) => {
     }
   }
   
+  // 检查缓存中是否已有该IP的地理位置
+  if (ipLocationCache.has(ip)) {
+    return ipLocationCache.get(ip);
+  }
+  
   // 精确匹配特定IP地址
   const specificIps = {
     '120.41.199.187': '中国 福建省 厦门市', // 厦门IP
@@ -338,11 +541,45 @@ const getIpLocation = (ip) => {
     return specificIps[ip];
   }
   
-  // 基于IP地址的前两个字节生成城市索引，提高准确性
-  const ipParts = ip.split('.');
-  // 计算IP的前两个字节的哈希值
-  const hash = parseInt(ipParts[0]) * 256 + parseInt(ipParts[1] || 0);
+  // 使用第三方IP查询API获取真实地理位置
+  // 这里使用ip-api.com，它提供免费的IP地理定位服务
+  try {
+    // ip-api.com同时支持IPv4和IPv6
+    const apiUrl = `https://ip-api.com/json/${ip}?lang=zh-CN`;
+    
+    const response = await fetch(apiUrl, {
+      method: 'GET',
+      mode: 'cors',
+      timeout: 3000 // 设置3秒超时
+    });
+    
+    if (response.ok) {
+      const data = await response.json();
+      
+      // 检查API响应是否成功
+      if (data.status === 'success') {
+        let location;
+        
+        // 构建地理位置字符串
+        if (data.country === '中国') {
+          // 中国IP，显示为"中国 省份 城市"
+          location = `中国 ${data.regionName || ''} ${data.city || ''}`.trim();
+        } else {
+          // 外国IP，显示为"国家 城市"
+          location = `${data.country} ${data.city || ''}`.trim();
+        }
+        
+        // 缓存结果
+        ipLocationCache.set(ip, location);
+        
+        return location;
+      }
+    }
+  } catch (error) {
+    console.warn('IP查询API请求失败:', error.message);
+  }
   
+  // 如果API请求失败，使用备用方案：基于IP地址生成城市
   // 城市列表，包含32个主要城市
   const cities = [
     '中国 北京市',
@@ -379,10 +616,33 @@ const getIpLocation = (ip) => {
     '中国 浙江省 温州市'
   ];
   
-  // 使用哈希值对城市数量取模，得到城市索引
-  const cityIndex = hash % cities.length;
+  // 检测IP类型并计算哈希值
+  let hash;
+  if (ip.includes(':')) {
+    // IPv6地址处理
+    // 将IPv6地址按冒号分割，取前两个部分计算哈希
+    const ipv6Parts = ip.split(':');
+    // 计算前两个部分的哈希值
+    const part1 = ipv6Parts[0] || '0';
+    const part2 = ipv6Parts[1] || '0';
+    // 将十六进制转换为十进制并计算哈希
+    hash = parseInt(part1, 16) + parseInt(part2, 16);
+  } else {
+    // IPv4地址处理
+    // 基于IP地址的前两个字节生成城市索引，提高准确性
+    const ipParts = ip.split('.');
+    // 计算IP的前两个字节的哈希值
+    hash = parseInt(ipParts[0]) * 256 + parseInt(ipParts[1] || 0);
+  }
   
-  return cities[cityIndex] || '中国 未知城市';
+  // 使用哈希值对城市数量取模，得到城市索引
+  const cityIndex = Math.abs(hash) % cities.length;
+  const location = cities[cityIndex] || '中国 未知城市';
+  
+  // 缓存结果
+  ipLocationCache.set(ip, location);
+  
+  return location;
 }
 
 // 处理头像加载成功事件
@@ -418,6 +678,10 @@ const handleSubmit = async () => {
       userAgent: navigator.userAgent,
       blog: form.value.blog
     };
+    
+    // 获取IP地址的地理位置
+    const location = await getIpLocation(messageData.ip);
+    messageData.location = location;
     
     // 提交留言到维格云
     await submitMessageToWikiCloud(messageData);
@@ -466,6 +730,22 @@ const fetchMessages = async () => {
   loading.value = true;
   try {
     const data = await getMessagesFromWikiCloud();
+    
+    // 为每条留言预加载IP地理位置
+    for (const message of data) {
+      if (message.ip) {
+        try {
+          // 获取并存储地理位置
+          message.location = await getIpLocation(message.ip);
+        } catch (error) {
+          console.warn(`为IP ${message.ip} 获取地理位置失败:`, error.message);
+          message.location = '未知城市';
+        }
+      } else {
+        message.location = '未知城市';
+      }
+    }
+    
     messages.value = data;
   } catch (error) {
     console.error('获取留言列表失败:', error);
@@ -524,16 +804,11 @@ onMounted(async () => {
   background-color: #ff526c;
 }
 
-.focus\:ring-ff6b81:focus {
-  border-color: #ff6b81;
-  box-shadow: 0 0 0 2px rgba(255, 107, 129, 0.2);
-}
-
 /* 留言列表样式 */
 .messages-list {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 1px;
 }
 
 /* 留言项样式 */

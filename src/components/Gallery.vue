@@ -33,7 +33,7 @@
           <img 
             :src="photo.image" 
             :alt="photo.description" 
-            class="w-full h-48 object-cover cursor-pointer"
+            class="w-full h-auto object-contain cursor-pointer"
             @click="openImage(photo.image)"
           >
           
