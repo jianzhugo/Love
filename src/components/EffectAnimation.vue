@@ -135,26 +135,33 @@ watch(mouseClickEffect, (newVal, oldVal) => {
 }, { deep: true, immediate: true })
 
 
-// 特效适配器 - 统一不同特效的启动和停止接口
-const effectAdapters = {
-  // 下雪效果适配器
-  1: {
+// 通用特效适配器创建函数
+const createCommonAdapter = () => {
+  return {
     start: () => {
-      // 调用全局start函数启动下雪特效
       if (window.start) {
         window.start()
       }
       return {
         stop: () => {
-          // 调用全局stop函数停止下雪特效
           if (window.stop) {
             window.stop()
           }
         }
       }
     }
-  },
-  // 樱花效果适配器
+  }
+}
+
+// 特效适配器 - 统一不同特效的启动和停止接口
+const effectAdapters = {
+  // 使用通用适配器的特效
+  1: createCommonAdapter(),  // 下雪效果
+  4: createCommonAdapter(),  // 流星雨效果
+  5: createCommonAdapter(),  // 粒子效果
+  6: createCommonAdapter(),  // 气泡效果
+  
+  // 樱花效果适配器（特殊处理）
   2: {
     start: () => {
       // 樱花效果会自动启动，不需要额外调用
@@ -168,7 +175,7 @@ const effectAdapters = {
       }
     }
   },
-  // 灯笼效果适配器
+  // 灯笼效果适配器（特殊处理）
   3: {
     start: () => {
       // 灯笼效果会自动启动，不需要额外调用
@@ -180,8 +187,7 @@ const effectAdapters = {
         }
       }
     }
-  },
-  // 其他特效的适配器可以后续添加
+  }
 }
 
 // 启动特效 - 使用script标签加载方式替代动态导入，处理with语句问题
@@ -203,11 +209,14 @@ const startEffect = (effectId) => {
     script.remove()
   })
   
-  // 特效文件路径映射
+  // 全局特效文件路径映射
   const effectPaths = {
     1: '/effects/xiaxue.js',    // 下雪效果
     2: '/effects/yinghua.js',   // 樱花效果
     3: '/effects/denglong.js',  // 灯笼效果
+    4: '/effects/liuxingyu.js', // 流星雨效果
+    5: '/effects/lizi.js',      // 粒子效果
+    6: '/effects/qipao.js'      // 气泡效果
   }
   
   const effectPath = effectPaths[effectId]
@@ -321,7 +330,7 @@ const startMouseClickEffect = (effectId) => {
   // 停止当前鼠标点击特效
   stopMouseClickEffect()
   
-  // 特效文件路径映射
+  // 鼠标特效文件路径映射
   const effectPaths = {
     1: '/effects/mousefire.js',   // 火焰效果
     2: '/effects/mouselove.js',   // 爱心效果

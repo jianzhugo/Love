@@ -23,41 +23,37 @@
       <div v-else-if="filteredPhotos.length === 0" class="text-center text-gray-200 py-16">
         <p class="text-lg">暂无照片</p>
       </div>
-      <div v-else class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+      <div v-else class="columns-2 sm:columns-3 md:columns-4 gap-4">
         <div 
-          v-for="photo in filteredPhotos" 
+          v-for="photo in displayedPhotos" 
           :key="photo.id" 
-          class="relative group overflow-hidden rounded-lg shadow-lg transition-all duration-500 hover:scale-105"
+          class="relative group overflow-hidden rounded-lg shadow-lg transition-all duration-500 hover:shadow-xl break-inside-avoid mb-4"
         >
           <!-- 照片 -->
           <img 
             :src="photo.image" 
             :alt="photo.description" 
-            class="w-full h-auto object-contain cursor-pointer"
+            class="w-full h-auto object-cover cursor-pointer lazy-load"
             @click="openImage(photo.image)"
+            loading="lazy"
           >
           
           <!-- 照片描述 -->
-          <div class="absolute inset-0 bg-gradient-to-t from-black bg-opacity-60 to-transparent flex items-end p-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+          <div class="absolute inset-0 bg-gradient-to-t from-red-300 bg-opacity-60 to-transparent flex items-end p-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
             <p class="text-white text-sm">{{ photo.description }}</p>
           </div>
-          
-          <!-- 放大按钮 -->
-          <button 
-            class="absolute top-2 right-2 bg-white bg-opacity-80 text-primary rounded-full p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-            @click="openImage(photo.image)"
-          >
-            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-              <path d="M10 3a7 7 0 100 14 7 7 0 000-14zM9.555 11H3.75a.75.75 0 010-1.5h5.805l-2.16-2.16a.75.75 0 111.06-1.06l3.5 3.5a.75.75 0 010 1.06l-3.5 3.5a.75.75 0 11-1.06-1.06l2.16-2.16z"></path>
-            </svg>
-          </button>
         </div>
       </div>
       
       <!-- 加载更多按钮 -->
-      <div class="text-center mt-10">
-        <button class="bg-white text-primary px-8 py-3 rounded-full font-medium shadow-md hover:shadow-lg transition-all duration-300">
-          加载更多照片
+      <div v-if="shouldShowLoadMore" class="text-center mt-10">
+        <button 
+          @click="loadMorePhotos" 
+          :disabled="isLoadingMore"
+          class="bg-white text-primary px-8 py-3 rounded-full font-medium shadow-md hover:shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          <span v-if="isLoadingMore" class="inline-block animate-spin mr-2 w-4 h-4"></span>
+          {{ isLoadingMore ? '加载中...' : '加载更多照片' }}
         </button>
       </div>
       
@@ -95,6 +91,9 @@ import { getGalleryPhotosFromWikiCloud, getConfigFromWikiCloud } from '../utils/
 // 相册数据
 const photos = ref([])
 const isLoading = ref(true)
+const isLoadingMore = ref(false)
+const currentPage = ref(1)
+const itemsPerPage = ref(30)
 
 // 相册分类
 const categories = ref(['全部'])
@@ -135,6 +134,28 @@ const filteredPhotos = computed(() => {
   }
   return photos.value.filter(photo => photo.category === activeCategory.value)
 })
+
+// 当前显示的照片
+const displayedPhotos = computed(() => {
+  const startIndex = 0
+  const endIndex = currentPage.value * itemsPerPage.value
+  return filteredPhotos.value.slice(startIndex, endIndex)
+})
+
+// 是否显示加载更多按钮
+const shouldShowLoadMore = computed(() => {
+  return displayedPhotos.value.length < filteredPhotos.value.length
+})
+
+// 加载更多照片
+const loadMorePhotos = () => {
+  isLoadingMore.value = true
+  // 延迟模拟加载过程
+  setTimeout(() => {
+    currentPage.value++
+    isLoadingMore.value = false
+  }, 500)
+}
 
 // 打开图片预览
 const openImage = (imageUrl) => {
