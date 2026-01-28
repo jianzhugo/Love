@@ -529,23 +529,11 @@ const getIpLocation = async (ip) => {
     return ipLocationCache.get(ip);
   }
   
-  // 精确匹配特定IP地址
-  const specificIps = {
-    '120.41.199.187': '中国 福建省 厦门市', // 厦门IP
-    '120.24.26.86': '中国 广东省 深圳市',   // 深圳IP
-    // 可以根据需要添加更多精确匹配的IP地址
-  };
-  
-  // 如果IP在精确匹配列表中，直接返回对应的城市
-  if (specificIps[ip]) {
-    return specificIps[ip];
-  }
-  
   // 使用第三方IP查询API获取真实地理位置
   // 这里使用ip-api.com，它提供免费的IP地理定位服务
   try {
     // ip-api.com同时支持IPv4和IPv6
-    const apiUrl = `https://ip-api.com/json/${ip}?lang=zh-CN`;
+    const apiUrl = `http://ip-api.com/json/${ip}?lang=zh-CN`;
     
     const response = await fetch(apiUrl, {
       method: 'GET',
